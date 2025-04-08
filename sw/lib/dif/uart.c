@@ -71,3 +71,53 @@ void _putchar(char byte) {
 char _getchar() {
     return uart_read(&__base_uart);
 }
+
+//Added by user
+
+void uart_wait_for_keypress(void *uart_base) {
+    while (!uart_read_ready(uart_base))
+        ;  // Wait until a key is pressed
+}
+
+void print_uart(const char *str) {
+    while (*str) {
+        uart_write(&__base_uart, (uint8_t)*str);
+        str++;
+    }
+}
+
+void bin_to_hex(uint8_t value, uint8_t *hex) {
+    const char hex_chars[] = "0123456789ABCDEF";
+    hex[0] = hex_chars[(value >> 4) & 0xF];  // Extrae el nibble alto
+    hex[1] = hex_chars[value & 0xF];         // Extrae el nibble bajo
+}
+
+void print_uart_int(uint32_t value) {
+    for (int i = 3; i >= 0; i--) {
+        uint8_t cur = (value >> (i * 8)) & 0xFF;
+        uint8_t hex[2];
+        bin_to_hex(cur, hex);
+        uart_write(&__base_uart, hex[0]);
+        uart_write(&__base_uart, hex[1]);
+    }
+}
+
+void print_uart_int_64(uint64_t value) {
+    for (int i = 7; i >= 0; i--) {
+        uint8_t cur = (value >> (i * 8)) & 0xFF;
+        uint8_t hex[2];
+        bin_to_hex(cur, hex);
+        uart_write(&__base_uart, hex[0]);
+        uart_write(&__base_uart, hex[1]);
+    }
+}
+
+void print_uart_addr(uint64_t addr) {
+    for (int i = 7; i >= 0; i--) {
+        uint8_t cur = (addr >> (i * 8)) & 0xFF;
+        uint8_t hex[2];
+        bin_to_hex(cur, hex);
+        uart_write(&__base_uart, hex[0]);
+        uart_write(&__base_uart, hex[1]);
+    }
+}

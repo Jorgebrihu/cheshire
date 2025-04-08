@@ -220,6 +220,34 @@ module cheshire_idma_wrap #(
       .irq_o            ( irq_o )
     );
 
+    ////////////////////////////////////
+    ///////   ILA DMA FRONTEND   ////////
+    ////////////////////////////////////
+
+    // xlnx_ila_idma_frontend ila_idma_frontend (
+    //   .clk(clk_i),
+
+    //   .probe0(axi_mst_fe_req_o.aw.addr),
+    //   .probe1(axi_mst_fe_req_o.aw_valid),
+    //   .probe2(axi_mst_fe_req_o.aw.len),
+    //   .probe3(axi_mst_fe_req_o.aw.size), 
+    //   .probe4(axi_mst_fe_req_o.aw.burst),
+    //   .probe5(axi_mst_fe_req_o.w.data),
+    //   .probe6(axi_mst_fe_req_o.w.strb), 
+    //   .probe7(axi_mst_fe_req_o.w_valid),
+    //   .probe8(axi_mst_fe_req_o.ar.addr),
+    //   .probe9(axi_mst_fe_req_o.ar.len),
+    //   .probe10(axi_mst_fe_req_o.ar.size),
+    //   .probe11(axi_mst_fe_req_o.ar.burst),
+    //   .probe12(axi_mst_fe_req_o.ar_valid),
+
+    //   .probe13(axi_mst_fe_rsp_i.aw_ready),
+    //   .probe14(axi_mst_fe_rsp_i.ar_ready),
+    //   .probe15(axi_mst_fe_rsp_i.w_ready),
+    //   .probe16(axi_mst_fe_rsp_i.r_valid), 
+    //   .probe17(axi_mst_fe_rsp_i.r.data)
+    // );
+
     always_comb begin
       idma_req_fe[FrontendCfg.desc64] = idma_desc64_req;
       idma_req_fe_valid[FrontendCfg.desc64] = idma_desc64_req_valid;
@@ -497,6 +525,7 @@ module cheshire_idma_wrap #(
     .busy_o           ( busy )
   );
 
+
   axi_rw_join #(
    .axi_req_t   ( axi_mst_req_t ),
    .axi_resp_t  ( axi_mst_rsp_t )
@@ -509,6 +538,27 @@ module cheshire_idma_wrap #(
    .slv_write_resp_o  ( axi_write_rsp ),
    .mst_req_o         ( axi_mst_be_req_o ),
    .mst_resp_i        ( axi_mst_be_rsp_i )
+  );
+
+  ////////////////////////////////////
+  ///////   ILA DMA BACKEND   ////////
+  ////////////////////////////////////
+
+  xlnx_ila_idma_backend ila_idma_backend (
+    .clk(clk_i),
+
+    .probe0(axi_mst_be_req_o.aw.addr),
+    .probe1(axi_mst_be_req_o.aw_valid),
+    .probe2(axi_mst_be_req_o.aw.burst),
+    .probe3(axi_mst_be_req_o.w.data),
+    .probe4(axi_mst_be_req_o.w.strb), 
+    .probe5(axi_mst_be_req_o.w_valid),
+    .probe6(axi_mst_be_req_o.ar.addr),
+    .probe7(axi_mst_be_req_o.ar.len),
+    .probe8(axi_mst_be_req_o.ar.burst),
+    .probe9(axi_mst_be_req_o.ar_valid),
+    .probe10(axi_mst_be_rsp_i.r_valid),
+    .probe11(axi_mst_be_rsp_i.r.data)
   );
 
 endmodule

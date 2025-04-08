@@ -47,6 +47,9 @@ gen_reports ${project_root}/reports.synth
 # TODO: debug this
 insert_ilas {soc_clk}
 
+
+set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets sys_clk]
+
 # Set implementation properties
 set_property strategy Performance_ExtraTimingOpt [get_runs impl_1]
 

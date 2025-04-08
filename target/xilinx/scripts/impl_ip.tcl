@@ -166,6 +166,71 @@ switch $proj {
         }
     }
 
+    xlnx_ila_idma_backend {
+        create_ip -name ila -vendor xilinx.com -library ip -module_name $proj
+        switch $board {
+            genesys2 {
+                set_property -dict [list  CONFIG.C_NUM_OF_PROBES {12} \
+                              CONFIG.C_PROBE0_WIDTH {48} \
+                              CONFIG.C_PROBE1_WIDTH {1} \
+                              CONFIG.C_PROBE2_WIDTH {2} \
+                              CONFIG.C_PROBE3_WIDTH {64} \
+                              CONFIG.C_PROBE4_WIDTH {8} \
+                              CONFIG.C_PROBE5_WIDTH {1} \
+                              CONFIG.C_PROBE6_WIDTH {48} \
+                              CONFIG.C_PROBE7_WIDTH {8} \
+                              CONFIG.C_PROBE8_WIDTH {2} \
+                              CONFIG.C_PROBE9_WIDTH {1} \
+                              CONFIG.C_PROBE10_WIDTH {1} \
+                              CONFIG.C_PROBE11_WIDTH {64} \
+                              CONFIG.C_DATA_DEPTH {1024}  \
+                              CONFIG.C_INPUT_PIPE_STAGES {1} \
+                    ] [get_ips $proj]
+            }
+            default { nocfgexit $proj $board }
+        }
+    }
+
+    xlnx_ila_shuffler_data {
+        create_ip -name ila -vendor xilinx.com -library ip -module_name $proj
+        switch $board {
+            genesys2 {
+                set_property -dict [list  CONFIG.C_NUM_OF_PROBES {9} \
+                              CONFIG.C_PROBE0_WIDTH {16} \
+                              CONFIG.C_PROBE1_WIDTH {1} \
+                              CONFIG.C_PROBE2_WIDTH {32} \
+                              CONFIG.C_PROBE3_WIDTH {4} \
+                              CONFIG.C_PROBE4_WIDTH {1} \
+                              CONFIG.C_PROBE5_WIDTH {16} \
+                              CONFIG.C_PROBE6_WIDTH {1} \
+                              CONFIG.C_PROBE7_WIDTH {32} \
+                              CONFIG.C_PROBE8_WIDTH {1} \
+                              CONFIG.C_DATA_DEPTH {1024}  \
+                              CONFIG.C_INPUT_PIPE_STAGES {1} \
+                    ] [get_ips $proj]
+            }
+            default { nocfgexit $proj $board }
+        }
+    }
+
+    xlnx_ila_shuffler_ctrl {
+        create_ip -name ila -vendor xilinx.com -library ip -module_name $proj
+        switch $board {
+            genesys2 {
+                set_property -dict [list  CONFIG.C_NUM_OF_PROBES {5} \
+                              CONFIG.C_PROBE0_WIDTH {32} \
+                              CONFIG.C_PROBE1_WIDTH {1} \
+                              CONFIG.C_PROBE2_WIDTH {32} \
+                              CONFIG.C_PROBE3_WIDTH {4} \
+                              CONFIG.C_PROBE4_WIDTH {1} \
+                              CONFIG.C_DATA_DEPTH {1024}  \
+                              CONFIG.C_INPUT_PIPE_STAGES {1} \
+                    ] [get_ips $proj]
+            }
+            default { nocfgexit $proj $board }
+        }
+    }
+      
 }
 
 # Generate targets
@@ -180,3 +245,143 @@ wait_on_run ${proj}_synth_1
 # Symlink proj for easy access and build tracking, ensuring its update
 file delete -force ${project_root}/out.xci
 file link -symbolic ${project_root}/out.xci $xci
+
+
+    
+
+    # xlnx_ila_idma_frontend {
+    #     create_ip -name ila -vendor xilinx.com -library ip -module_name $proj
+    #     switch $board {
+    #         genesys2 {
+    #             set_property -dict [list  CONFIG.C_NUM_OF_PROBES {18} \
+    #                           CONFIG.C_PROBE0_WIDTH {48} \
+    #                           CONFIG.C_PROBE1_WIDTH {1} \
+    #                           CONFIG.C_PROBE2_WIDTH {8} \
+    #                           CONFIG.C_PROBE3_WIDTH {3} \
+    #                           CONFIG.C_PROBE4_WIDTH {2} \
+    #                           CONFIG.C_PROBE5_WIDTH {64} \
+    #                           CONFIG.C_PROBE6_WIDTH {8} \
+    #                           CONFIG.C_PROBE7_WIDTH {1} \
+    #                           CONFIG.C_PROBE8_WIDTH {48} \
+    #                           CONFIG.C_PROBE9_WIDTH {8} \
+    #                           CONFIG.C_PROBE10_WIDTH {3} \
+    #                           CONFIG.C_PROBE11_WIDTH {2} \
+    #                           CONFIG.C_PROBE12_WIDTH {1} \
+    #                           CONFIG.C_PROBE13_WIDTH {1} \
+    #                           CONFIG.C_PROBE14_WIDTH {1} \
+    #                           CONFIG.C_PROBE15_WIDTH {1} \
+    #                           CONFIG.C_PROBE16_WIDTH {1} \
+    #                           CONFIG.C_PROBE17_WIDTH {64} \
+    #                           CONFIG.C_DATA_DEPTH {2048}  \
+    #                           CONFIG.C_INPUT_PIPE_STAGES {1} \
+    #                 ] [get_ips $proj]
+    #         }
+    #         default { nocfgexit $proj $board }
+    #     }
+    # }
+
+
+    # xlnx_ila_req_in_legalizer {
+    #     create_ip -name ila -vendor xilinx.com -library ip -module_name $proj
+    #     switch $board {
+    #         genesys2 {
+    #             set_property -dict [list  CONFIG.C_NUM_OF_PROBES {12} \
+    #                           CONFIG.C_PROBE0_WIDTH {48} \
+    #                           CONFIG.C_PROBE1_WIDTH {48} \
+    #                           CONFIG.C_PROBE2_WIDTH {32} \
+    #                           CONFIG.C_PROBE3_WIDTH {1} \
+    #                           CONFIG.C_PROBE4_WIDTH {1} \
+    #                           CONFIG.C_PROBE5_WIDTH {2} \
+    #                           CONFIG.C_PROBE6_WIDTH {2} \
+    #                           CONFIG.C_PROBE7_WIDTH {1} \
+    #                           CONFIG.C_PROBE8_WIDTH {1} \
+    #                           CONFIG.C_PROBE9_WIDTH {1} \
+    #                           CONFIG.C_PROBE10_WIDTH {1} \
+    #                           CONFIG.C_PROBE11_WIDTH {1} \
+    #                           CONFIG.C_DATA_DEPTH {2048}  \
+    #                           CONFIG.C_INPUT_PIPE_STAGES {1} \
+    #                 ] [get_ips $proj]
+    #         }
+    #         default { nocfgexit $proj $board }
+    #     }
+    # }
+
+
+    # xlnx_ila_intermediate_legalizer {
+    #     create_ip -name ila -vendor xilinx.com -library ip -module_name $proj
+    #     switch $board {
+    #         genesys2 {
+    #             set_property -dict [list  CONFIG.C_NUM_OF_PROBES {6} \
+    #                           CONFIG.C_PROBE0_WIDTH {48} \
+    #                           CONFIG.C_PROBE1_WIDTH {32} \
+    #                           CONFIG.C_PROBE2_WIDTH {1} \
+    #                           CONFIG.C_PROBE3_WIDTH {48} \
+    #                           CONFIG.C_PROBE4_WIDTH {32} \
+    #                           CONFIG.C_PROBE5_WIDTH {1} \
+    #                           CONFIG.C_DATA_DEPTH {2048}  \
+    #                           CONFIG.C_INPUT_PIPE_STAGES {1} \
+    #                 ] [get_ips $proj]
+    #         }
+    #         default { nocfgexit $proj $board }
+    #     }
+    # }
+
+    # xlnx_ila_req_out_legalizer {
+    #     create_ip -name ila -vendor xilinx.com -library ip -module_name $proj
+    #     switch $board {
+    #         genesys2 {
+    #             set_property -dict [list  CONFIG.C_NUM_OF_PROBES {8} \
+    #                           CONFIG.C_PROBE0_WIDTH {45} \
+    #                           CONFIG.C_PROBE1_WIDTH {2} \
+    #                           CONFIG.C_PROBE2_WIDTH {8} \
+    #                           CONFIG.C_PROBE3_WIDTH {1} \
+    #                           CONFIG.C_PROBE4_WIDTH {1} \
+    #                           CONFIG.C_PROBE5_WIDTH {1} \
+    #                           CONFIG.C_PROBE6_WIDTH {1} \
+    #                           CONFIG.C_PROBE7_WIDTH {1} \
+    #                           CONFIG.C_DATA_DEPTH {2048}  \
+    #                           CONFIG.C_INPUT_PIPE_STAGES {1} \
+    #                 ] [get_ips $proj]
+    #         }
+    #         default { nocfgexit $proj $board }
+    #     }
+    # }
+
+    # xlnx_ila_test_ram {
+    #     create_ip -name ila -vendor xilinx.com -library ip -module_name $proj
+    #     switch $board {
+    #         genesys2 {
+    #             set_property -dict [list  CONFIG.C_NUM_OF_PROBES {5} \
+    #                           CONFIG.C_PROBE0_WIDTH {48} \
+    #                           CONFIG.C_PROBE1_WIDTH {64} \
+    #                           CONFIG.C_PROBE2_WIDTH {1} \
+    #                           CONFIG.C_PROBE3_WIDTH {1} \
+    #                           CONFIG.C_PROBE4_WIDTH {8} \
+    #                           CONFIG.C_DATA_DEPTH {1024}  \
+    #                           CONFIG.C_INPUT_PIPE_STAGES {1} \
+    #                 ] [get_ips $proj]
+    #         }
+    #         default { nocfgexit $proj $board }
+    #     }
+    # }
+
+    # xlnx_ila_axi_myram {
+    #     create_ip -name ila -vendor xilinx.com -library ip -module_name $proj
+    #     switch $board {
+    #         genesys2 {
+    #             set_property -dict [list  CONFIG.C_NUM_OF_PROBES {8} \
+    #                           CONFIG.C_PROBE0_WIDTH {48} \
+    #                           CONFIG.C_PROBE1_WIDTH {2} \
+    #                           CONFIG.C_PROBE2_WIDTH {8} \
+    #                           CONFIG.C_PROBE3_WIDTH {1} \
+    #                           CONFIG.C_PROBE4_WIDTH {64} \
+    #                           CONFIG.C_PROBE5_WIDTH {8} \
+    #                           CONFIG.C_PROBE6_WIDTH {1} \
+    #                           CONFIG.C_PROBE7_WIDTH {1} \
+    #                           CONFIG.C_DATA_DEPTH {1024}  \
+    #                           CONFIG.C_INPUT_PIPE_STAGES {1} \
+    #                 ] [get_ips $proj]
+    #         }
+    #         default { nocfgexit $proj $board }
+    #     }
+    # }
