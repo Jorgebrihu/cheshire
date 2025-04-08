@@ -39,8 +39,8 @@
 #define SHUFFLER_A3_PMC_CYCLES_REG     (SHUFFLER_BASE + A3_PMC_CYCLES_REG)
 #define SHUFFLER_A3_PMC_ERRORS_REG     (SHUFFLER_BASE + A3_PMC_ERRORS_REG)
 
-#define ARTICO3_DATA            0x40011000              // Beginning of data of ID 1
-#define OUTPUT_SLOT_MATMUL      0x40017000
+#define ARTICO3_DATA            0x50010000              // Beginning of data of ID 1
+#define OUTPUT_SLOT_MATMUL      0x50018000
 
 
 #define DMA_TRANSFER_MATMUL_SIZE 4096*2
@@ -234,10 +234,10 @@ int main(void) {
     //     print_uart_int_64(*(matmul+i));
     // } 
 
-    // for (int i = 0; i<100; i++){
-    //     print_uart("\n\rValue of resultado["); print_uart_int((uint32_t)&resultado[i]); print_uart("]: ");
-    //     print_uart_int_64(resultado[i]);
-    // } 
+    for (int i = 0; i<DMA_TRANSFER_MATMUL_SIZE/2; i++){
+        //print_uart("\n\rValue of resultado["); print_uart_int((uint32_t)&resultado[i]); print_uart("]: ");
+        print_uart_int(resultado[i]);print_uart("     ");
+    } 
 
     print_uart("\n\rAll done, spin-loop.\r\n");
     while (1) {
