@@ -21,7 +21,8 @@ gdb_report_register_access_error enable
 riscv set_reset_timeout_sec 120
 riscv set_command_timeout_sec 120
 
-riscv set_prefer_sba off
+# riscv set_prefer_sba off
+riscv set_mem_access progbuf sysbus abstract 
 
 # Exit when debugger detaches
 $_TARGETNAME configure -event gdb-detach {

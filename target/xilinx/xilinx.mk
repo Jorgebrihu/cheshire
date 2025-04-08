@@ -37,7 +37,7 @@ $(CHS_XILINX_DIR)/build/%/out.xci: \
 
 CHS_XILINX_BOARDS := genesys2 vcu128
 
-CHS_XILINX_IPS_genesys2 := clkwiz vio mig7s
+CHS_XILINX_IPS_genesys2 := clkwiz vio mig7s xlnx_ila_idma_backend xlnx_ila_shuffler_data xlnx_ila_shuffler_ctrl 
 CHS_XILINX_IPS_vcu128   := clkwiz vio ddr4
 
 $(CHS_XILINX_DIR)/scripts/add_sources.%.tcl: $(CHS_ROOT)/Bender.yml

@@ -1772,6 +1772,215 @@ module cheshire_soc import cheshire_pkg::*; #(
 
   end
 
+  if (Cfg.Artico3) begin : gen_artico3
+
+
+    //Signal to gather traces from artico3 and use them in the monitor
+    logic [7:0]  concat_start_rdy_traces;
+
+    /****************************************************************/  
+    /********     Convert REQ/RSP signals from/to AXI      **********/
+    /****************************************************************/
+
+    AXI_BUS #(
+        .AXI_ADDR_WIDTH ( Cfg.AddrWidth     ),
+        .AXI_DATA_WIDTH ( Cfg.AxiDataWidth  ),
+        .AXI_ID_WIDTH   ( AxiSlvIdWidth     ),
+        .AXI_USER_WIDTH ( Cfg.AxiUserWidth  )
+    ) shuffler_ctrl();
+
+    `AXI_ASSIGN_FROM_REQ(shuffler_ctrl, axi_out_req[AxiOut.artico3_ctrl])
+    `AXI_ASSIGN_TO_RESP(axi_out_rsp[AxiOut.artico3_ctrl], shuffler_ctrl)
+
+    ////////////////////////////
+    //SHUFFLER CONTROL SIGNALS//
+    ////////////////////////////
+
+    //-----------------------------------------------------------------------------//
+    // Convert AXI bus from crossbar to AXI_LITE bus
+      AXI_LITE #(
+          .AXI_ADDR_WIDTH ( Cfg.AddrWidth     ),
+          .AXI_DATA_WIDTH ( Cfg.AxiDataWidth  )
+      ) shuffler_ctrl_lite();
+
+      axi_to_axi_lite_intf #(
+          /// AXI bus parameters
+          .AXI_ADDR_WIDTH   ( Cfg.AddrWidth    ),
+          .AXI_DATA_WIDTH   ( Cfg.AxiDataWidth ),
+          .AXI_ID_WIDTH     ( AxiSlvIdWidth    ),
+          .AXI_USER_WIDTH   ( Cfg.AxiUserWidth ),
+          /// Maximum number of outstanding writes.
+          .AXI_MAX_WRITE_TXNS(15),   //4
+          /// Maximum number of outstanding reads.
+          .AXI_MAX_READ_TXNS(15),    //4
+          .FALL_THROUGH(1)
+      ) axi_to_axi_lite_intf (
+          .clk_i(clk_i),
+          .rst_ni(rst_ni),
+          .testmode_i(0),
+          .slv (shuffler_ctrl),
+          .mst (shuffler_ctrl_lite)
+      );
+
+      AXI_LITE #(
+          .AXI_ADDR_WIDTH ( 32        ),
+          .AXI_DATA_WIDTH ( 32        )
+      ) shuffler_control_lite_32bit();
+
+      // Adapter from 64bits to 32bits
+      axi_lite_dw_converter_intf #(
+          /// AXI4-Lite address width of the ports.
+          .AXI_ADDR_WIDTH          (32),
+          /// AXI4-Lite data width of the slave port.
+          .AXI_SLV_PORT_DATA_WIDTH (64),
+          /// AXI4-Lite data width of the master port.
+          .AXI_MST_PORT_DATA_WIDTH (32)
+
+          ) i_axi_lite_dw_converter_intf (
+          /// Clock, positive edge triggered.
+          .clk_i   (clk_i),
+          /// Asynchrounous reset, active low.
+          .rst_ni  (rst_ni),
+          /// Slave port interface.
+          .slv     (shuffler_ctrl_lite),
+          /// Master port interface.
+          .mst     (shuffler_control_lite_32bit)
+          );
+
+
+      /////////////////////////
+      //SHUFFLER DATA SIGNALS//
+      /////////////////////////
+
+      AXI_BUS #(
+        .AXI_ADDR_WIDTH ( Cfg.AddrWidth     ),
+        .AXI_DATA_WIDTH ( Cfg.AxiDataWidth  ),
+        .AXI_ID_WIDTH   ( AxiSlvIdWidth     ),
+        .AXI_USER_WIDTH ( Cfg.AxiUserWidth  )
+      ) shuffler_data();
+
+      `AXI_ASSIGN_FROM_REQ(shuffler_data, axi_out_req[AxiOut.artico3_data])
+      `AXI_ASSIGN_TO_RESP(axi_out_rsp[AxiOut.artico3_data], shuffler_data)
+
+      //-----------------------------------------------------------------------------//
+      // Create AXI_BUS for signals between axi_dw_downsizer and artico3_module modules
+      AXI_BUS #(
+          .AXI_ADDR_WIDTH ( 32     ),
+          .AXI_DATA_WIDTH ( 32     ),
+          .AXI_ID_WIDTH   ( AxiSlvIdWidth     ),
+          .AXI_USER_WIDTH ( 0      )
+      ) shuffler_data_32bit();
+
+      axi_dw_converter_intf #(
+          .AXI_ID_WIDTH            (AxiSlvIdWidth),
+          .AXI_ADDR_WIDTH          (32),
+          .AXI_SLV_PORT_DATA_WIDTH (64),
+          .AXI_MST_PORT_DATA_WIDTH (32),
+          .AXI_USER_WIDTH          (0),
+          .AXI_MAX_READS           (15)
+
+      ) i_axi_dw_converter_intf (
+          .clk_i  (clk_i),
+          .rst_ni (rst_ni),
+          .slv    (shuffler_data),
+          .mst    (shuffler_data_32bit)
+      );
+
+      
+      //-----------------------------------------------------------------------------//
+      //Connect 32-bit signals to artico3_module module
+
+      
+      artico3_module i_a3_matmul (
+
+          .A3_RESET        (rst_ni),
+          .A3_ACLK         (clk_i),
+
+          .INTERRUPT       (intr.intn.artico3_irq),
+
+          // Conexiones para S00_AXI (shuffler_ctrl_lite)
+          .S00_AXI_AWADDR  (shuffler_control_lite_32bit.aw_addr),
+          .S00_AXI_AWPROT  (shuffler_control_lite_32bit.aw_prot),
+          .S00_AXI_AWVALID (shuffler_control_lite_32bit.aw_valid),
+          .S00_AXI_AWREADY (shuffler_control_lite_32bit.aw_ready),
+          .S00_AXI_WDATA   (shuffler_control_lite_32bit.w_data),
+          .S00_AXI_WSTRB   (shuffler_control_lite_32bit.w_strb),
+          .S00_AXI_WVALID  (shuffler_control_lite_32bit.w_valid),
+          .S00_AXI_WREADY  (shuffler_control_lite_32bit.w_ready),
+          .S00_AXI_BRESP   (shuffler_control_lite_32bit.b_resp),
+          .S00_AXI_BVALID  (shuffler_control_lite_32bit.b_valid),
+          .S00_AXI_BREADY  (shuffler_control_lite_32bit.b_ready),
+          .S00_AXI_ARADDR  (shuffler_control_lite_32bit.ar_addr),
+          .S00_AXI_ARPROT  (shuffler_control_lite_32bit.ar_prot),
+          .S00_AXI_ARVALID (shuffler_control_lite_32bit.ar_valid),
+          .S00_AXI_ARREADY (shuffler_control_lite_32bit.ar_ready),
+          .S00_AXI_RDATA   (shuffler_control_lite_32bit.r_data),
+          .S00_AXI_RRESP   (shuffler_control_lite_32bit.r_resp),
+          .S00_AXI_RVALID  (shuffler_control_lite_32bit.r_valid),
+          .S00_AXI_RREADY  (shuffler_control_lite_32bit.r_ready),
+
+          // Conexiones para S01_AXI (shuffler_data)
+          .S01_AXI_AWID     (shuffler_data_32bit.aw_id),
+          .S01_AXI_AWADDR   (shuffler_data_32bit.aw_addr),
+          .S01_AXI_AWLEN    (shuffler_data_32bit.aw_len),
+          .S01_AXI_AWSIZE   (shuffler_data_32bit.aw_size),
+          .S01_AXI_AWBURST  (shuffler_data_32bit.aw_burst),
+          .S01_AXI_AWLOCK   (shuffler_data_32bit.aw_lock),
+          .S01_AXI_AWCACHE  (shuffler_data_32bit.aw_cache),
+          .S01_AXI_AWPROT   (shuffler_data_32bit.aw_prot),
+          .S01_AXI_AWQOS    (shuffler_data_32bit.aw_qos),
+          .S01_AXI_AWREGION (shuffler_data_32bit.aw_region),
+          .S01_AXI_AWVALID  (shuffler_data_32bit.aw_valid),
+          .S01_AXI_AWREADY  (shuffler_data_32bit.aw_ready),
+          .S01_AXI_WDATA    (shuffler_data_32bit.w_data),
+          .S01_AXI_WSTRB    (shuffler_data_32bit.w_strb),
+          .S01_AXI_WLAST    (shuffler_data_32bit.w_last),
+          .S01_AXI_WVALID   (shuffler_data_32bit.w_valid),
+          .S01_AXI_WREADY   (shuffler_data_32bit.w_ready),
+          .S01_AXI_BID      (shuffler_data_32bit.b_id),
+          .S01_AXI_BRESP    (shuffler_data_32bit.b_resp),
+          .S01_AXI_BVALID   (shuffler_data_32bit.b_valid),
+          .S01_AXI_BREADY   (shuffler_data_32bit.b_ready),
+          .S01_AXI_ARID     (shuffler_data_32bit.ar_id),
+          .S01_AXI_ARADDR   (shuffler_data_32bit.ar_addr),
+          .S01_AXI_ARLEN    (shuffler_data_32bit.ar_len),
+          .S01_AXI_ARSIZE   (shuffler_data_32bit.ar_size),
+          .S01_AXI_ARBURST  (shuffler_data_32bit.ar_burst),
+          .S01_AXI_ARLOCK   (shuffler_data_32bit.ar_lock),
+          .S01_AXI_ARCACHE  (shuffler_data_32bit.ar_cache),
+          .S01_AXI_ARPROT   (shuffler_data_32bit.ar_prot),
+          .S01_AXI_ARQOS    (shuffler_data_32bit.ar_qos),
+          .S01_AXI_ARREGION (shuffler_data_32bit.ar_region),
+          .S01_AXI_ARVALID  (shuffler_data_32bit.ar_valid),
+          .S01_AXI_ARREADY  (shuffler_data_32bit.ar_ready),
+          .S01_AXI_RID      (shuffler_data_32bit.r_id),
+          .S01_AXI_RDATA    (shuffler_data_32bit.r_data),
+          .S01_AXI_RRESP    (shuffler_data_32bit.r_resp),
+          .S01_AXI_RLAST    (shuffler_data_32bit.r_last),
+          .S01_AXI_RVALID   (shuffler_data_32bit.r_valid),
+          .S01_AXI_RREADY   (shuffler_data_32bit.r_ready),
+
+          .CONCAT_TRACES(concat_start_rdy_traces)
+
+      );
+
+      // // -------------------------------------------
+      // //                   ILA SHUFFLER
+      // // -------------------------------------------
+
+      xlnx_ila_shuffler_ctrl ila_shuffler (
+          .clk(clk_i),
+
+          .probe0(shuffler_control_lite_32bit.aw_addr),
+          .probe1(shuffler_control_lite_32bit.aw_valid),
+
+          .probe2(shuffler_control_lite_32bit.w_data), 
+          .probe3(shuffler_control_lite_32bit.w_strb),
+          .probe4(shuffler_control_lite_32bit.w_valid)
+      );
+
+  end
+
   //////////////////
   //  Assertions  //
   //////////////////

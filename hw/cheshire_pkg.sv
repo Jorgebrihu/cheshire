@@ -134,6 +134,7 @@ package cheshire_pkg;
     bit     SerialLink;
     bit     Vga;
     bit     Usb;
+    bit     Artico3;
     bit     AxiRt;
     bit     Clic;
     bit     IrqRouter;
@@ -241,6 +242,7 @@ package cheshire_pkg;
     logic i2c_fmt_threshold;
     logic uart;
     logic zero;
+    logic artico3_irq;
   } cheshire_int_intr_t;
 
   typedef struct packed {
@@ -342,6 +344,8 @@ package cheshire_pkg;
     aw_bt dma_fe_reg64;
     aw_bt slink;
     aw_bt ext_base;
+    aw_bt artico3_ctrl;
+    aw_bt artico3_data;
     aw_bt num_out;
     aw_bt num_rules;
     arul_t [aw_bt'(-1):0] map;
@@ -369,6 +373,9 @@ package cheshire_pkg;
     if (cfg.Dma & cfg.DmaConfFrontendReg64)   begin i++; r++; ret.dma_fe_reg64 = i; ret.map[r] = '{i, 'h0100_1000, 'h0100_2000}; end
     if (cfg.SerialLink)   begin i++; r++; ret.slink = i;
         ret.map[r] = '{i, cfg.SlinkRegionStart, cfg.SlinkRegionEnd}; end
+    //Adding artico3 
+    if (cfg.Artico3)     begin i++; r++; ret.artico3_ctrl = i; ret.map[r] = '{i, 'h4000_0000, 'h4000_1000}; end
+    if (cfg.Artico3)     begin i++; r++; ret.artico3_data = i; ret.map[r] = '{i, 'h5000_0000, 'h50A0_0000}; end
     // External port indices start after internal ones
     i++; r++;
     ret.ext_base  = i;
@@ -644,6 +651,7 @@ package cheshire_pkg;
     Gpio              : 1,
     Dma               : 1,
     SerialLink        : 1,
+    Artico3           : 1,
     Vga               : 1,
     Usb               : 1,
     AxiRt             : 0,
@@ -696,8 +704,8 @@ package cheshire_pkg;
     DmaConfAmoNumCuts       : 1,
     DmaConfAmoPostCut       : 1,
     DmaConfFrontendDesc64   : 1,
-    DmaConfFrontendReg64    : 1,
-    DmaConfFrontendReg64TwoD: 1,
+    DmaConfFrontendReg64    : 0,
+    DmaConfFrontendReg64TwoD: 0,
     DmaNumAxInFlight        : 16,
     DmaMemSysDepth          : 8,
     DmaJobFifoDepth         : 2,

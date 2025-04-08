@@ -45,3 +45,15 @@ void uart_read_str(void *uart_base, void *dst, uint64_t len);
 void _putchar(char byte);
 
 char _getchar();
+
+//Added by user
+
+void uart_wait_for_keypress(void *uart_base);
+
+void print_uart(const char* str);
+
+void print_uart_int(uint32_t value);
+
+void print_uart_int_64(uint64_t value);
+
+void print_uart_addr(uint64_t addr);

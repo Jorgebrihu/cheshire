@@ -44,6 +44,20 @@ sources:
   - hw/cheshire_idma_wrap.sv
   - hw/cheshire_pkg.sv
   - hw/cheshire_soc.sv
+  - hw/artico3/a3_wrapper.vhd
+  - hw/artico3/artico3_module.vhd
+  - hw/artico3/bram_dualport.vhd
+  - hw/artico3/fifo.vhd
+  - hw/artico3/matmul.vhd
+  - hw/artico3/matmul_mul_32s_32s_32_2_1.vhd
+  - hw/artico3/shuffler.vhd
+  - hw/artico3/shuffler_control.vhd
+  - hw/artico3/shuffler_data.vhd
+  - hw/artico3/system_a3_slot_0_0.vhd
+  - hw/artico3/system_a3_slot_1_0.vhd
+  - hw/artico3/system_a3_slot_2_0.vhd
+  - hw/artico3/system_a3_slot_3_0.vhd
+  - hw/artico3/system_artico3_shuffler_0_0.vhd
 
   - target: any(simulation, test)
     files:

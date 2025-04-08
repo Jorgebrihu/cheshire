@@ -23,9 +23,9 @@
   `define USE_DDR3
   `define USE_FAN
   `define USE_VIO
-  `define USE_I2C
-  `define USE_VGA
-  `define USE_USB
+  //`define USE_I2C
+  //`define USE_VGA
+  //`define USE_USB
   `define USE_STARTUPE2
   `define USE_QSPI
 `endif
