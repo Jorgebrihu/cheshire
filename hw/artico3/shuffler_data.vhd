@@ -252,8 +252,9 @@ architecture behavioral of shuffler_data is
             probe5 : in std_logic;
             probe6 : in std_logic_vector(31 downto 0);
             probe7 : in std_logic;
-            probe8 : in std_logic_vector(3 downto 0)
-
+            probe8 : in std_logic_vector(3 downto 0);
+            probe9 : in std_logic;
+            probe10 : in std_logic
 
         );
     end component;
@@ -464,7 +465,9 @@ begin
             probe5 => axi_arvalid,
             probe6 => axi_rdata,
             probe7 => axi_rvalid,
-            probe8 => axi_wstrb
+            probe8 => axi_wstrb,
+            probe9 => axi_wready,
+            probe10 => axi_rready
         );
         
     -------------------------------

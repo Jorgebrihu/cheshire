@@ -45,10 +45,41 @@ gen_reports ${project_root}/reports.synth
 
 # Instantiate debug core and ILAs
 # TODO: debug this
-insert_ilas {soc_clk}
+# mark_debug_signals
+# insert_ilas {soc_clk}
 
 
 set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets sys_clk]
+
+#Set reconfiguration slots
+set_property LOC BUFHCE_X0Y72 [get_cells i_cheshire_soc/gen_artico3.i_a3_matmul/artico3_shuffler_0/U0/clock_gen[0].hbuff_clkgen.clock_buffer]
+set_property LOC BUFHCE_X1Y72 [get_cells i_cheshire_soc/gen_artico3.i_a3_matmul/artico3_shuffler_0/U0/clock_gen[1].hbuff_clkgen.clock_buffer]
+set_property LOC BUFHCE_X0Y60 [get_cells i_cheshire_soc/gen_artico3.i_a3_matmul/artico3_shuffler_0/U0/clock_gen[2].hbuff_clkgen.clock_buffer]
+set_property LOC BUFHCE_X1Y60 [get_cells i_cheshire_soc/gen_artico3.i_a3_matmul/artico3_shuffler_0/U0/clock_gen[3].hbuff_clkgen.clock_buffer]
+
+create_pblock pblock_a3_slot_0
+resize_pblock pblock_a3_slot_0 -add {SLICE_X8Y300:SLICE_X23Y349 DSP48_X0Y120:DSP48_X1Y139 RAMB18_X0Y120:RAMB18_X1Y139 RAMB36_X0Y60:RAMB36_X1Y69}
+add_cells_to_pblock pblock_a3_slot_0 [get_cells [list i_cheshire_soc/gen_artico3.i_a3_matmul/a3_slot_0]] 
+set_property CONTAIN_ROUTING true [get_pblocks pblock_a3_slot_0] 
+set_property EXCLUDE_PLACEMENT TRUE [get_pblocks pblock_a3_slot_0]
+
+create_pblock pblock_a3_slot_1
+resize_pblock pblock_a3_slot_1 -add {SLICE_X122Y300:SLICE_X135Y349 DSP48_X5Y120:DSP48_X5Y139 RAMB18_X4Y120:RAMB18_X5Y139 RAMB36_X4Y60:RAMB36_X5Y69}
+add_cells_to_pblock pblock_a3_slot_1 [get_cells [list i_cheshire_soc/gen_artico3.i_a3_matmul/a3_slot_1]] 
+set_property CONTAIN_ROUTING true [get_pblocks pblock_a3_slot_1] 
+set_property EXCLUDE_PLACEMENT TRUE [get_pblocks pblock_a3_slot_1]
+
+create_pblock pblock_a3_slot_2
+resize_pblock pblock_a3_slot_2 -add {SLICE_X8Y250:SLICE_X23Y299 DSP48_X0Y100:DSP48_X1Y119 RAMB18_X0Y100:RAMB18_X1Y119 RAMB36_X0Y50:RAMB36_X1Y59}
+add_cells_to_pblock pblock_a3_slot_2 [get_cells [list i_cheshire_soc/gen_artico3.i_a3_matmul/a3_slot_2]] 
+set_property CONTAIN_ROUTING true [get_pblocks pblock_a3_slot_2] 
+set_property EXCLUDE_PLACEMENT TRUE [get_pblocks pblock_a3_slot_2]
+
+create_pblock pblock_a3_slot_3
+resize_pblock pblock_a3_slot_3 -add {SLICE_X122Y250:SLICE_X135Y299 DSP48_X5Y100:DSP48_X5Y119 RAMB18_X4Y100:RAMB18_X5Y119 RAMB36_X4Y50:RAMB36_X5Y59}
+add_cells_to_pblock pblock_a3_slot_3 [get_cells [list i_cheshire_soc/gen_artico3.i_a3_matmul/a3_slot_3]] 
+set_property CONTAIN_ROUTING true [get_pblocks pblock_a3_slot_3] 
+set_property EXCLUDE_PLACEMENT TRUE [get_pblocks pblock_a3_slot_3]
 
 # Set implementation properties
 set_property strategy Performance_ExtraTimingOpt [get_runs impl_1]

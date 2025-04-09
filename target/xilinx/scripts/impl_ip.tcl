@@ -183,7 +183,7 @@ switch $proj {
                               CONFIG.C_PROBE9_WIDTH {1} \
                               CONFIG.C_PROBE10_WIDTH {1} \
                               CONFIG.C_PROBE11_WIDTH {64} \
-                              CONFIG.C_DATA_DEPTH {1024}  \
+                              CONFIG.C_DATA_DEPTH {2048}  \
                               CONFIG.C_INPUT_PIPE_STAGES {1} \
                     ] [get_ips $proj]
             }
@@ -195,7 +195,7 @@ switch $proj {
         create_ip -name ila -vendor xilinx.com -library ip -module_name $proj
         switch $board {
             genesys2 {
-                set_property -dict [list  CONFIG.C_NUM_OF_PROBES {9} \
+                set_property -dict [list  CONFIG.C_NUM_OF_PROBES {11} \
                               CONFIG.C_PROBE0_WIDTH {16} \
                               CONFIG.C_PROBE1_WIDTH {1} \
                               CONFIG.C_PROBE2_WIDTH {32} \
@@ -205,7 +205,7 @@ switch $proj {
                               CONFIG.C_PROBE6_WIDTH {1} \
                               CONFIG.C_PROBE7_WIDTH {32} \
                               CONFIG.C_PROBE8_WIDTH {1} \
-                              CONFIG.C_DATA_DEPTH {1024}  \
+                              CONFIG.C_DATA_DEPTH {2048}  \
                               CONFIG.C_INPUT_PIPE_STAGES {1} \
                     ] [get_ips $proj]
             }
@@ -223,14 +223,13 @@ switch $proj {
                               CONFIG.C_PROBE2_WIDTH {32} \
                               CONFIG.C_PROBE3_WIDTH {4} \
                               CONFIG.C_PROBE4_WIDTH {1} \
-                              CONFIG.C_DATA_DEPTH {1024}  \
+                              CONFIG.C_DATA_DEPTH {2048}  \
                               CONFIG.C_INPUT_PIPE_STAGES {1} \
                     ] [get_ips $proj]
             }
             default { nocfgexit $proj $board }
         }
-    }
-      
+    } 
 }
 
 # Generate targets
@@ -385,3 +384,6 @@ file link -symbolic ${project_root}/out.xci $xci
     #         default { nocfgexit $proj $board }
     #     }
     # }
+
+
+    

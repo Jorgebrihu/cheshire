@@ -668,7 +668,7 @@ package cheshire_pkg;
     // LLC: 128 KiB, up to 2 GiB DRAM
     LlcNotBypass      : 1,
     LlcSetAssoc       : 8,
-    LlcNumLines       : 256,
+    LlcNumLines       : 256*3, //Multiplico por 4 para tener una SPM de 512KB y utilizar el idma
     LlcNumBlocks      : 8,
     LlcMaxReadTxns    : 16,
     LlcMaxWriteTxns   : 16,

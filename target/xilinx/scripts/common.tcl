@@ -113,7 +113,7 @@ proc insert_ilas {clk_net_name} {
     create_debug_core i_ila ila
     set_property -dict [list \
         ALL_PROBE_SAME_MU {true} ALL_PROBE_SAME_MU_CNT {4} C_ADV_TRIGGER {true} \
-        C_DATA_DEPTH {16384} C_EN_STRG_QUAL {true} C_INPUT_PIPE_STAGES {0} \
+        C_DATA_DEPTH {8192} C_EN_STRG_QUAL {true} C_INPUT_PIPE_STAGES {0} \
         C_TRIGIN_EN {false} C_TRIGOUT_EN {false} \
         ] [get_debug_cores i_ila]
     # Connect SoC clock
@@ -145,3 +145,45 @@ proc insert_ilas {clk_net_name} {
     save_constraints -force
     implement_debug_core
 }
+
+proc mark_debug_signals {} {
+    # Shuffler data ILA shuffler control
+    set_property MARK_DEBUG true [get_nets -hier -filter {NAME =~ "*shuffler_control_lite_32bit*aw_addr*"}] 
+    set_property MARK_DEBUG true [get_nets -hier -filter {NAME =~ "*shuffler_control_lite_32bit*aw_valid*"}]  
+    set_property MARK_DEBUG true [get_nets -hier -filter {NAME =~ "*shuffler_control_lite_32bit*w_data*"}] 
+    set_property MARK_DEBUG true [get_nets -hier -filter {NAME =~ "*shuffler_control_lite_32bit*w_strb*"}] 
+    set_property MARK_DEBUG true [get_nets -hier -filter {NAME =~ "*shuffler_control_lite_32bit*w_valid*"}] 
+
+
+
+    # Shuffler data ILA shuffler data
+    set_property MARK_DEBUG true [get_nets -hier -filter {NAME =~ "*artico3_shuffler_0/U0/shuffler_data/axi_araddr[*]"}] 
+    set_property MARK_DEBUG true [get_nets -hier -filter {NAME =~ "*artico3_shuffler_0/U0/shuffler_data/axi_araddr*"}] 
+    set_property MARK_DEBUG true [get_nets -hier -filter {NAME =~ "*artico3_shuffler_0/U0/shuffler_data/axi_wdata[*]"}] 
+    set_property MARK_DEBUG true [get_nets -hier -filter {NAME =~ "*artico3_shuffler_0/U0/shuffler_data/axi_wvalid*"}] 
+    set_property MARK_DEBUG true [get_nets -hier -filter {NAME =~ "*artico3_shuffler_0/U0/shuffler_data/axi_araddr[*]"}] 
+    set_property MARK_DEBUG true [get_nets -hier -filter {NAME =~ "*artico3_shuffler_0/U0/shuffler_data/axi_arvalid*"}]
+    set_property MARK_DEBUG true [get_nets -hier -filter {NAME =~ "*artico3_shuffler_0/U0/shuffler_data/axi_rdata[*]"}] 
+    set_property MARK_DEBUG true [get_nets -hier -filter {NAME =~ "*artico3_shuffler_0/U0/shuffler_data/axi_rvalid*"}]  
+    set_property MARK_DEBUG true [get_nets -hier -filter {NAME =~ "*artico3_shuffler_0/U0/shuffler_data/axi_wstrb[*]"}] 
+    set_property MARK_DEBUG true [get_nets -hier -filter {NAME =~ "*artico3_shuffler_0/U0/shuffler_data/axi_wready*"}] 
+    set_property MARK_DEBUG true [get_nets -hier -filter {NAME =~ "*artico3_shuffler_0/U0/shuffler_data/axi_rready*"}] 
+    
+    #IDMA backend ILA 
+        ## be_rsp_i
+    set_property MARK_DEBUG true [get_nets -hier -filter {NAME =~ "*i_cheshire_soc/gen_dma.i_dma/axi_mst_be_rsp_i[r][data]*"}]
+    set_property MARK_DEBUG true [get_nets -hier -filter {NAME =~ "*i_cheshire_soc/gen_dma.i_dma/axi_mst_be_rsp_i[r_valid]*"}]
+
+        ## be_req_o
+    set_property MARK_DEBUG true [get_nets -hier -filter {NAME =~ "*i_cheshire_soc/gen_dma.i_dma/axi_mst_be_req_o[aw][addr]*"}]
+    set_property MARK_DEBUG true [get_nets -hier -filter {NAME =~ "*i_cheshire_soc/gen_dma.i_dma/axi_mst_be_req_o[aw_valid]*"}]
+    set_property MARK_DEBUG true [get_nets -hier -filter {NAME =~ "*i_cheshire_soc/gen_dma.i_dma/axi_mst_be_req_o[aw][burst]*"}]
+    set_property MARK_DEBUG true [get_nets -hier -filter {NAME =~ "*i_cheshire_soc/gen_dma.i_dma/axi_mst_be_req_o[w][data]*"}]
+    set_property MARK_DEBUG true [get_nets -hier -filter {NAME =~ "*i_cheshire_soc/gen_dma.i_dma/axi_mst_be_req_o[w][strb]*"}]
+    set_property MARK_DEBUG true [get_nets -hier -filter {NAME =~ "*i_cheshire_soc/gen_dma.i_dma/axi_mst_be_req_o[w_valid]*"}]
+    set_property MARK_DEBUG true [get_nets -hier -filter {NAME =~ "*i_cheshire_soc/gen_dma.i_dma/axi_mst_be_req_o[ar][addr]*"}]
+    set_property MARK_DEBUG true [get_nets -hier -filter {NAME =~ "*i_cheshire_soc/gen_dma.i_dma/axi_mst_be_req_o[ar][len]*"}]
+    set_property MARK_DEBUG true [get_nets -hier -filter {NAME =~ "*i_cheshire_soc/gen_dma.i_dma/axi_mst_be_req_o[ar][burst]*"}]
+    set_property MARK_DEBUG true [get_nets -hier -filter {NAME =~ "*i_cheshire_soc/gen_dma.i_dma/axi_mst_be_req_o[ar_valid]*"}]
+}
+
